@@ -21,9 +21,9 @@
         <dd><input name="name_first" size="30"></dd>
       <dt>ふりがな</dt>
         <dd><strong>せい</strong>(例: きゅうこう)</dd>
-        <dd><input name="ruby_last" size="30"></dd>
+        <dd><input name="kana_last" size="30"></dd>
         <dd><strong>めい</strong>(例: たろう)</dd>
-        <dd><input name="ruby_first" size="30"></dd>
+        <dd><input name="kana_first" size="30"></dd>
       <dt>学生番号</dt>
         <dd>例: 12230000</dd>
         <dd><input name="student_id" size="20"></dd>
@@ -48,7 +48,7 @@
         <li>８文字以上で数字、英大文字、英小文字、記号のすべてを含んでいるもの</li>
         <li>１６文字以上のもの</li>
         </ul></dd>
-         <dd><input type="password" name="password" size="20"></dd>
+        <dd><input type="password" name="password" size="20"></dd>
       <dt>パスワード(確認)</dt>
         <dd><input type="password" name="pswd_confirm" size="20"></dd>
       </dl>
