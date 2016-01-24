@@ -29,7 +29,7 @@
         <dd><input name="student_id" size="20"></dd>
         <dt>九工大ID(情報科学センターアカウント名)</dt>
         <dd>例: m230000i</dd>
-        <dd><input name="isc_account" size="20"> @mail.kyutech.jp<br>
+        <dd><input name="isc_account" size="20">@mail.kyutech.jp<br>
     </fieldset>
     <fieldset>
       <legend>アカウント情報</legend>
@@ -41,7 +41,7 @@
         <li>英大文字、記号、全角文字などを含まないもの</li>
         <li>先頭に数字を用いていないもの</li>
         </ul></dd>
-        <dd><input name="club_account" size="10"> @club.kyutech.ac.jp</dd>
+        <dd><input name="club_account" size="10">@club.kyutech.ac.jp</dd>
       <dt>パスワード</dt>
         <dd><strong>注:以下のいずれかの条件を満たしてください。</strong></dd>
         <dd><ul>
