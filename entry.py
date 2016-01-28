@@ -20,41 +20,45 @@ session_opts = {
 
 
 @route('/')
-def title():
+def index():
     return template('title')
 
 
 @route('/show', method='POST')
-def show():
+def confirm():
     post = {}
+    error = []
     for key, value in request.forms.decode().allitems():
         post[key] = value
 
-    for key in post:
-        if not post[key]:
-            valid.print_error('empty')
+    if valid.isempty(post):
+        error.append(valid.state('empty'))
 
-    if not valid.isstudent_id(post['student_id']):
-        valid.print_error('student_id')
+    if not valid.isid(post['student_id']):
+        error.append(valid.state('id'))
 
-    if not valid.isisc_account(post['isc_account']):
-        valid.print_error('isc_account')
+    if not valid.isisc(post['isc_account']):
+        error.append(valid.state('isc'))
 
-    if not valid.isusername(post['club_account']):
-        valid.print_error('club_account')
+    if not valid.isuser(post['club_account']):
+        error.append(valid.state('user'))
+
+    if valid.isduplicate(post['club_account']):
+        error.append(valid.state('duplicate'))
+
+    if  valid.iswaiting(post['club_account']):
+        error.append(valid.state('waiting'))
 
     if not valid.ispassword(post['password']):
-        valid.print_error('password')
+        error.append(valid.state('password'))
 
-    if not post['password'] == post['reenter']
-        valid.print_error('not match')
+    if not valid.isequal(post['password'], post['reenter']):
+        error.append(valid.state('mismatch'))
 
     session = request.environ.get('beaker.session')
     for key in post:
         if key == "password":
             session[key] = post[key] + "[shadow]"
-        elif key = "reenter":
-            pass
         else:
             session[key] = post[key]
 
@@ -66,21 +70,25 @@ def show():
     except herror:
         remote_host = "-----"
 
-    return template('show',
-        name_last=session['name_last'],
-        name_first=session['name_first'],
-        kana_last=session['kana_last'],
-        kana_first=session['kana_first'],
-        student_id=session['student_id'],
-        isc_account=session['isc_account'],
-        club_account=session['club_account'],
-        time=time.strftime('%Y-%m-%d %H:%M:%S %Z%z'),
-        remote_host=remote_host,
-        remote_addr=remote_addr)
+    if len(error) > 0:
+        return template('error', error_statement='<br>'.join(error))
+    else:
+        return template('show',
+            name_last=session['name_last'],
+            name_first=session['name_first'],
+            kana_last=session['kana_last'],
+            kana_first=session['kana_first'],
+            student_id=session['student_id'],
+            isc_account=session['isc_account'],
+            club_account=session['club_account'],
+            time=time.strftime('%Y-%m-%d %H:%M:%S %Z%z'),
+            remote_host=remote_host,
+            remote_addr=remote_addr
+        )
 
 
 @route('/mail')
-def mail():
+def send():
     session = request.environ.get('beaker.session')
     session.save()
 
@@ -92,7 +100,7 @@ def mail():
     except herror:
         remote_host = "-----"
 
-    FROM_ADDR = "kelt@club.kyutech.ac.jp"
+    from_addr = "kelt@club.kyutech.ac.jp"
     to_addr = "lan2014@club.kyutech.ac.jp"
     subject = "Account Request validation"
     body = message.write_first(session, time, remote_host, remote_addr)
