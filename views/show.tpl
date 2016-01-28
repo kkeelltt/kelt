@@ -18,7 +18,7 @@
 <p>  Account : {{club_account}}</p>
 <p>  -------------------------------------------------------------</p>
 <p>  Date    : {{time}}</p>
-<p>  From    : {{hostname}} ({{remote_addr}})</p>
+<p>  From    : {{remote_host}} ({{remote_addr}})</p>
 <p>=================================================================</p>
 <form action="/mail", type="hidden", name="confirm", value="true">
   <input type="submit", value="送信">

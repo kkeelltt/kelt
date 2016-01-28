@@ -48,9 +48,9 @@
         <li>８文字以上で数字、英大文字、英小文字、記号のすべてを含んでいるもの</li>
         <li>１６文字以上のもの</li>
         </ul></dd>
-        <dd><input type="password" name="password" size="20"></dd>
+        <dd><input name="password" size="20"></dd>
       <dt>パスワード(確認)</dt>
-        <dd><input type="password" name="pswd_confirm" size="20"></dd>
+        <dd><input name="reenter" size="20"></dd>
       </dl>
     </fieldset>
     <fieldset>
