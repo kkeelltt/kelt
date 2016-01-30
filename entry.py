@@ -9,6 +9,7 @@ from beaker.middleware import SessionMiddleware
 import pytz
 import message
 import valid
+import database
 
 
 session_opts = {
@@ -19,7 +20,7 @@ session_opts = {
 }
 
 
-# http://:8080/ にアクセスされると実行
+# http://:8080/
 @route('/')
 def index():
     # セッションIDを保存
@@ -69,7 +70,7 @@ def show(key=None):
 
     # 入力内容に誤りが
     if error:
-        # ある: エラーを出力
+        # ある: エラーの一覧を表示
         return template('error', error_statement='<br>'.join(error))
     else:
         # ない: セッションIDを更新し、セッションに保存
@@ -89,7 +90,7 @@ def show(key=None):
         except herror:
             session['remote_host'] = '-----'
 
-        # 申請内容の確認画面を出力
+        # 申請内容の確認画面を表示
         return template('show', key=session.id,
             name_last=session['name_last'],
             name_first=session['name_first'],
@@ -139,29 +140,8 @@ def ask(key=None):
     if not key == session.id:
         return template('error', error_statement=valid.state('lost_key'))
 
-
-    conn = sqlite3.connect('example.db')
-    c = conn.cursor()
-
-    c.execute('''
-        CREATE TABLE waiting(
-            name_last, name_first, kana_last, kana_first,
-            student_id, isc_account, club_account
-        )'''
-    )
-
-    c.execute('INSERT INTO waiting VALUES (?, ?, ?, ?, ?, ?, ?)',
-        session['name_last'],
-        session['name_first'],
-        session['kana_last'],
-        session['kana_first'],
-        session['student_id'],
-        session['isc_account'],
-        session['club_account']
-    )
-
-    conn.commit()
-    conn.close()
+    # 承認待ちリストに突っ込む
+    database.insert(session)
 
     # ユーザ宛に申請完了メールを送信
     from_addr = 'kelt@club.kyutech.ac.jp'
