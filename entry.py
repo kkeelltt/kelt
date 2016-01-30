@@ -75,13 +75,17 @@ def show(key=None):
         # ない: セッションIDを更新し、セッションに保存
         session.invalidate()
         for key in post:
-            session[key] = post[key]
+            if key == 'password':
+                session[key] = post[key] + '[shadow]'
+            else:
+                session[key] = post[key]
 
         # 申請日時・ホスト名・IPアドレスを取得
-        session['time'] = datetime.now(pytz.timezone('Asia/Tokyo'))
+        date = datetime.now(pytz.timezone('Asia/Tokyo'))
+        session['format_date'] = date.strftime('%Y-%m-%d %H:%M:%S %Z%z')
         session['remote_addr'] = request.remote_addr
         try:
-            session['remote_host'] = gethostbyaddr(remote_addr)[0]
+            session['remote_host'] = gethostbyaddr(session['remote_addr'])[0]
         except herror:
             session['remote_host'] = '-----'
 
@@ -94,7 +98,7 @@ def show(key=None):
             student_id=session['student_id'],
             isc_account=session['isc_account'],
             club_account=session['club_account'],
-            time=session['time'].strftime('%Y-%m-%d %H:%M:%S %Z%z'),
+            datetime=session['format_date'],
             remote_host=session['remote_host'],
             remote_addr=session['remote_addr']
         )
@@ -111,15 +115,13 @@ def mail(key=None):
     if not key == session.id:
         return template('error', error_statement=valid.state('lost_key'))
 
-    # メールを作成
+    # ユーザ宛に確認用メールを送信
     from_addr = 'kelt@club.kyutech.ac.jp'
     to_addr = 'lan2014@club.kyutech.ac.jp'
-    charset = 'utf-8'
     subject = 'Account Request validation'
     body = message.write_first(session)
-    msg = message.create_msg(from_addr, to_addr, charset, subject, body)
+    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, body)
 
-    # メールを送信
     host = 'mail.club.kyutech.ac.jp'
     message.send_msg(from_addr, to_addr, msg, host, 25)
 
@@ -136,6 +138,7 @@ def ask(key=None):
         return template('error', error_statement=valid.state('access'))
     if not key == session.id:
         return template('error', error_statement=valid.state('lost_key'))
+
 
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
@@ -160,9 +163,25 @@ def ask(key=None):
     conn.commit()
     conn.close()
 
-    # send mail to user
+    # ユーザ宛に申請完了メールを送信
+    from_addr = 'kelt@club.kyutech.ac.jp'
+    to_addr = 'lan2014@club.kyutech.ac.jp'
+    subject = 'Account Request Succeeded'
+    body = message.write_first(session)
+    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, body)
 
-    # send mail to admin
+    host = 'mail.club.kyutech.ac.jp'
+    message.send_msg(from_addr, to_addr, msg, host, 25)
+
+    # 運用部宛に申請通知メールを送信
+    from_addr = 'kelt@club.kyutech.ac.jp'
+    to_addr = 'lan2014@club.kyutech.ac.jp'
+    subject = 'Request for account ({club_account})'.format(**session)
+    body = message.write_first(session)
+    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, body)
+
+    host = 'mail.club.kyutech.ac.jp'
+    message.send_msg(from_addr, to_addr, msg, host, 25)
 
     session.delete()
 
