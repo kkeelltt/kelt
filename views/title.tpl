@@ -10,7 +10,7 @@
   <h2 class="box-header"> <span class="mw-headline"><big>申請フォーム</big></span></h2>
   <p>九州工業大学 学生自治ネットワーク委員会 御中</p>
   <p>共用計算機利用規約に同意し、共用計算機 (remote.club.kyutech.ac.jp) のアカウントの発行を申請します。</p>
-  <form action="/show" method="POST">
+  <form action="/show/{{key}}" method="POST">
     <fieldset>
       <legend>申請者情報</legend>
       <dl>
@@ -56,8 +56,8 @@
     <fieldset>
       <legend>申請</legend>
       <div class="buttons">
-        <p><input type="checkbox" name="agree" value="true"> 利用規約に同意し、アカウントを申請します。</p>
-        <p><input type="submit" value="submit"> <input type="reset" value="reset">
+        <p><input type="checkbox" name="agree" value="agree"> 利用規約に同意し、アカウントを申請します。</p>
+        <p><input type="submit" value="submit"> <input type="reset" value="reset"></p>
       </div>
     </fieldset>
   </form>
