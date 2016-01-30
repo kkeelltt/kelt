@@ -34,7 +34,7 @@ def index():
 @post('/show')
 @post('/show/<key>')
 def show(key=None):
-    # 不正なアクセスでないかどうかを調べる
+    # 不正なアクセスじゃないかをチェック
     session = request.environ.get('beaker.session')
     if not key:
         return template('error', error_statement=valid.state('access'))
@@ -77,15 +77,13 @@ def show(key=None):
         for key in post:
             session[key] = post[key]
 
-        session.save()
-
         # 申請日時・ホスト名・IPアドレスを取得
-        time = datetime.now(pytz.timezone('Asia/Tokyo'))
-        remote_addr = request.remote_addr
+        session['time'] = datetime.now(pytz.timezone('Asia/Tokyo'))
+        session['remote_addr'] = request.remote_addr
         try:
-            remote_host = gethostbyaddr(remote_addr)[0]
+            session['remote_host'] = gethostbyaddr(remote_addr)[0]
         except herror:
-            remote_host = '-----'
+            session['remote_host'] = '-----'
 
         # 申請内容の確認画面を出力
         return template('show', key=session.id,
@@ -96,9 +94,9 @@ def show(key=None):
             student_id=session['student_id'],
             isc_account=session['isc_account'],
             club_account=session['club_account'],
-            time=time.strftime('%Y-%m-%d %H:%M:%S %Z%z'),
-            remote_host=remote_host,
-            remote_addr=remote_addr
+            time=session['time'].strftime('%Y-%m-%d %H:%M:%S %Z%z'),
+            remote_host=session['remote_host'],
+            remote_addr=session['remote_addr']
         )
 
 
@@ -106,28 +104,22 @@ def show(key=None):
 @route('/mail')
 @route('/mail/<key>')
 def mail(key=None):
-    # 不正なアクセスでないかどうかを調べる
+    # 不正なアクセスじゃないかをチェック
     session = request.environ.get('beaker.session')
     if not key:
         return template('error', error_statement=valid.state('access'))
     if not key == session.id:
         return template('error', error_statement=valid.state('lost_key'))
 
-    # 申請日時・ホスト名・IPアドレスを取得
-    time = datetime.now(pytz.timezone('Asia/Tokyo'))
-    remote_addr = request.remote_addr
-    try:
-        remote_host = gethostbyaddr(remote_addr)[0]
-    except herror:
-        remote_host = '-----'
-
+    # メールを作成
     from_addr = 'kelt@club.kyutech.ac.jp'
     to_addr = 'lan2014@club.kyutech.ac.jp'
     charset = 'utf-8'
     subject = 'Account Request validation'
-    body = message.write_first(session, time, remote_host, remote_addr)
+    body = message.write_first(session)
     msg = message.create_msg(from_addr, to_addr, charset, subject, body)
 
+    # メールを送信
     host = 'mail.club.kyutech.ac.jp'
     message.send_msg(from_addr, to_addr, msg, host, 25)
 
@@ -138,7 +130,7 @@ def mail(key=None):
 @route('/ask')
 @route('/ask/<key>')
 def ask(key=None):
-    # 不正なアクセスでないかどうかを調べる
+    # 不正なアクセスじゃないかをチェック
     session = request.environ.get('beaker.session')
     if not key:
         return template('error', error_statement=valid.state('access'))
