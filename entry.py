@@ -74,7 +74,6 @@ def show(key=None):
         return template('error', error_statement='<br>'.join(error))
     else:
         # ない: セッションIDを更新し、セッションに保存
-        #session.invalidate()
         for key in post:
             if key == 'password':
                 session[key] = post[key] + '[shadow]'
@@ -86,9 +85,11 @@ def show(key=None):
         session['format_date'] = date.strftime('%Y-%m-%d %H:%M:%S %Z%z')
         session['remote_addr'] = request.remote_addr
         try:
-            session['remote_host'] = gethostbyaddr(request.remote_addr])[0]
+            session['remote_host'] = gethostbyaddr(request.remote_addr)[0]
         except herror:
             session['remote_host'] = '-----'
+
+        session.save()
 
         # 申請内容の確認画面を表示
         return template('show', key=session.id,
@@ -116,15 +117,26 @@ def mail(key=None):
     if not key == session.id:
         return template('error', error_statement=valid.state('lost_key'))
 
-    # ユーザ宛に確認用メールを送信
-    host = 'mail.club.kyutech.ac.jp'
-    from_addr = 'kelt@club.kyutech.ac.jp'
-    to_addr = 'lan2014@club.kyutech.ac.jp'
-    subject = 'Account Request validation'
-    for_user = message.write_first(session)
-    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
-    message.send_msg(from_addr, to_addr, msg, host, 25)
+    # セッションIDを更新
+    tmp = {}
+    for key in session:
+        tmp[key] = session[key]
 
+    session.invalidate()
+    for key in tmp:
+        session[key] = tmp[key]
+
+    session.save()
+
+    # ユーザ宛に確認用メールを送信
+    #host = 'mail.club.kyutech.ac.jp'
+    #from_addr = 'kelt@club.kyutech.ac.jp'
+    #to_addr = 'lan2014@club.kyutech.ac.jp'
+    #subject = 'Account Request validation'
+    for_user = message.write_first(session)
+    #msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
+    #message.send_msg(from_addr, to_addr, msg, host, 25)
+    print(for_user)
     return template('mail')
 
 
@@ -143,22 +155,14 @@ def ask(key=None):
     database.insert(session)
 
     # ユーザ宛に申請完了メールを送信
-    host = 'mail.club.kyutech.ac.jp'
-    from_addr = 'kelt@club.kyutech.ac.jp'
-    to_addr = 'lan2014@club.kyutech.ac.jp'
-    subject = 'Account Request Succeeded'
-    for_user = message.write_first(session)
-    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
-    message.send_msg(from_addr, to_addr, msg, host, 25)
-
-    # 運用部宛に申請通知メールを送信
-    host = 'mail.club.kyutech.ac.jp'
-    from_addr = 'kelt@club.kyutech.ac.jp'
-    to_addr = 'lan2014@club.kyutech.ac.jp'
-    subject = 'Request for account ({club_account})'.format(**session)
-    for_admin = message.write_first(session)
-    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_admin)
-    message.send_msg(from_addr, to_addr, msg, host, 25)
+    #host = 'mail.club.kyutech.ac.jp'
+    #from_addr = 'kelt@club.kyutech.ac.jp'
+    #to_addr = 'lan2014@club.kyutech.ac.jp'
+    #subject = 'Account Request Succeeded'
+    for_user = message.write_second(session)
+    #msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
+    #message.send_msg(from_addr, to_addr, msg, host, 25)
+    print(for_user)
 
     session.delete()
 

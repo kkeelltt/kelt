@@ -33,7 +33,7 @@ def write_first(session):
     body += '以下のとおりアカウント申請を承りました。\n'
     body += '\n'
     body += '=================================================================\n'
-    body += '　氏名　　　　　 : {name_last} {name_first} (kana_last} {kana_first})\n'.format(**session)
+    body += '　氏名　　　　　 : {name_last} {name_first} ({kana_last} {kana_first})\n'.format(**session)
     body += '　学生番号　　　 : {student_id}\n'.format(**session)
     body += '　メールアドレス : {isc_account}@mail.kyutech.jp\n'.format(**session)
     body += '　-------------------------------------------------------------\n'
@@ -43,7 +43,7 @@ def write_first(session):
     body += '　アクセス元　　 : {remote_host} ({remote_addr})\n'.format(**session)
     body += '=================================================================\n'
     body += '\n'
-    body += 'これらの申請内容に間違いがなければ、申請日時から +=30分以内>> に\n'
+    body += 'これらの申請内容に間違いがなければ、申請日時から30分以内に\n'
     body += '以下の URL へアクセスしてください。\n'
     body += 'http://:8080/ask/' + session.id + '\n'
     body += '\n'
@@ -70,7 +70,7 @@ def write_second(session):
     body += '以下のとおりアカウント申請を承りました。\n'
     body += '\n'
     body += '=================================================================\n'
-    body += '　氏名　　　　　 : {name_last} {name_first} (kana_last} {kana_first})\n'.format(**session)
+    body += '　氏名　　　　　 : {name_last} {name_first} ({kana_last} {kana_first})\n'.format(**session)
     body += '　学生番号　　　 : {student_id}\n'.format(**session)
     body += '　メールアドレス : {isc_account}@mail.kyutech.jp\n'.format(**session)
     body += '　-------------------------------------------------------------\n'

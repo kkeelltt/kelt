@@ -6,12 +6,11 @@ import sqlite3
 
 
 def create():
-    conn = sqlite3.connect('example.db')
+    conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
-    sql = '''CREATE TABLE waiting
-             (name_last, name_first, kana_last, kana_first,
-              student_id, isc_account, club_account)'''
+    sql = '''CREATE TABLE waiting(name_last, name_first, kana_last, kana_first,
+                                  club_account, isc_account, password)'''
     c.execute(sql)
 
     conn.commit()
@@ -19,13 +18,21 @@ def create():
 
 
 def insert(session):
-    conn = sqlite3.connect('example.db')
+
+    conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
-    sql = '''INSERT INTO waiting VALUES
-             (:name_last, :name_first, :kana_last, :kana_first,
-              :student_id, :isc_account, :club_account)'''
-    c.execute(sql, session)
+    sql = 'INSERT INTO waiting VALUES(?, ?, ?, ?, ?, ?, ?)'
+    c.execute(sql,
+        (session['name_last'],
+         session['name_first'],
+         session['kana_last'],
+         session['kana_first'],
+         session['club_account'],
+         session['isc_account'],
+         session['password']
+        )
+    )
 
     conn.commit()
     conn.close()
