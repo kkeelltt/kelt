@@ -8,15 +8,16 @@
 - ldap3
 
 ## fairu kousei
-root/
-  ├-views/
-  │   ├-error.tpl
-  │   ├-title.tpl
-  │   ├-show.tpl
-  │   ├-mail.tpl
-  │   └-ask.tpl
-  ├-entry.py
-  ├-approve.py
-  ├-valid.py
-  ├-message.py
-  └-database.py
+.
+├── approve.py
+├── database.py
+├── entry.py
+├── message.py
+├── valid.py
+└── views/
+    ├── ask.tpl
+    ├── error.tpl
+    ├── mail.tpl
+    ├── request.tpl
+    ├── show.tpl
+    └── title.tpl
