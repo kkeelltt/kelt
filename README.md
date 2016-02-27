@@ -2,10 +2,10 @@
 
 
 ## siyou tu-ru
-- bottle
-- beaker
-- pytz
-- ldap3
+  bottle
+  beaker
+  pytz
+  ldap3
 
 ## fairu kousei
 .
@@ -13,12 +13,12 @@
 ├── database.py
 ├── entry.py
 ├── message.py
+├── README.md
 ├── valid.py
-└── views/
+└── views
     ├── ask.tpl
     ├── error.tpl
     ├── mail.tpl
     ├── request.tpl
     ├── show.tpl
     └── title.tpl
-
