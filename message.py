@@ -45,7 +45,7 @@ def write_first(session):
     body += '\n'
     body += 'これらの申請内容に間違いがなければ、申請日時から30分以内に\n'
     body += '以下の URL へアクセスしてください。\n'
-    body += 'http://:8080/ask/' + session.id + '\n'
+    body += 'http://localhost:8080/ask/' + session.id + '\n'
     body += '\n'
     body += '※この申請内容に心当たりのない場合は、誠におそれいりますが\n'
     body += '　メールを破棄して頂きますようお願いいたします。\n'

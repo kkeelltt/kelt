@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from socket import gethostbyaddr, herror
+from socket import gethostbyaddr
 from datetime import datetime
 from bottle import route, post, run, template, request, app
 from beaker.middleware import SessionMiddleware
@@ -86,7 +86,7 @@ def show(key=None):
         session['remote_addr'] = request.remote_addr
         try:
             session['remote_host'] = gethostbyaddr(request.remote_addr)[0]
-        except herror:
+        except OSError:
             session['remote_host'] = '-----'
 
         session.save()
@@ -129,13 +129,13 @@ def mail(key=None):
     session.save()
 
     # ユーザ宛に確認用メールを送信
-    #host = 'mail.club.kyutech.ac.jp'
-    #from_addr = 'kelt@club.kyutech.ac.jp'
-    #to_addr = 'lan2014@club.kyutech.ac.jp'
-    #subject = 'Account Request validation'
+    host = 'mail.club.kyutech.ac.jp'
+    from_addr = 'kelt@club.kyutech.ac.jp'
+    to_addr = 'lan2014@club.kyutech.ac.jp'
+    subject = 'Account Request validation'
     for_user = message.write_first(session)
-    #msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
-    #message.send_msg(from_addr, to_addr, msg, host, 25)
+    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
+    message.send_msg(from_addr, to_addr, msg, host, 25)
     print(for_user)
     return template('mail')
 
@@ -155,13 +155,13 @@ def ask(key=None):
     database.insert(session)
 
     # ユーザ宛に申請完了メールを送信
-    #host = 'mail.club.kyutech.ac.jp'
-    #from_addr = 'kelt@club.kyutech.ac.jp'
-    #to_addr = 'lan2014@club.kyutech.ac.jp'
-    #subject = 'Account Request Succeeded'
+    host = 'mail.club.kyutech.ac.jp'
+    from_addr = 'kelt@club.kyutech.ac.jp'
+    to_addr = 'lan2014@club.kyutech.ac.jp'
+    subject = 'Account Request Succeeded'
     for_user = message.write_second(session)
-    #msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
-    #message.send_msg(from_addr, to_addr, msg, host, 25)
+    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
+    message.send_msg(from_addr, to_addr, msg, host, 25)
     print(for_user)
 
     session.delete()
