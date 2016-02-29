@@ -26,16 +26,16 @@ def index():
     # セッションIDを保存
     session = request.environ.get('beaker.session')
     session.save()
-    return template('title', key=session.id)
+    return template('index', key=session.id)
 
 
-# title.tplからリンク
-@route('/show')
-@route('/show/<key>')
-@post('/show')
-@post('/show/<key>')
-def show(key=None):
-    # 不正なアクセスじゃないかをチェック
+# index.tplからリンク
+@route('/confirm')
+@route('/confirm/<key>')
+@post('/confirm')
+@post('/confirm/<key>')
+def confirm(key=None):
+    # 不正なアクセスでないかチェック
     session = request.environ.get('beaker.session')
     if not key:
         return template('error', error_statement=valid.state('access'))
@@ -49,22 +49,30 @@ def show(key=None):
 
     # 入力内容の整合性チェック
     error = []
-    if valid.isempty(post):
+    if valid.blank(post):
         error.append(valid.state('empty'))
-    if not valid.isid(post['student_id']):
+
+    if not valid.student_id(post['student_id']):
         error.append(valid.state('student_id'))
-    if not valid.isisc(post['isc_account']):
+
+    if not valid.isc(post['isc_account']):
         error.append(valid.state('isc_account'))
-    if not valid.isusername(post['club_account']):
+
+    if not valid.username(post['club_account']):
         error.append(valid.state('username'))
-    if valid.isduplicate(post['club_account']):
-        error.append(valid.state('duplicate'))
-    if  valid.iswaiting(post['club_account']):
+
+#    if valid.duplicate(post['club_account']):
+#        error.append(valid.state('duplicate'))
+
+    if  valid.waiting(post['club_account']):
         error.append(valid.state('waiting'))
-    if not valid.ispassword(post['password']):
+
+    if not valid.password(post['password']):
         error.append(valid.state('password'))
+
     if not post['password'] == post['reenter']:
         error.append(valid.state('mismatch'))
+
     if not request.forms.agree == 'agree':
         error.append(valid.state('disagree'))
 
@@ -73,7 +81,7 @@ def show(key=None):
         # ある: エラーの一覧を表示
         return template('error', error_statement='<br>'.join(error))
     else:
-        # ない: セッションIDを更新し、セッションに保存
+        # ない: セッションに保存
         for key in post:
             if key == 'password':
                 session[key] = post[key] + '[shadow]'
@@ -92,7 +100,7 @@ def show(key=None):
         session.save()
 
         # 申請内容の確認画面を表示
-        return template('show', key=session.id,
+        return template('confirm', key=session.id,
             name_last=session['name_last'],
             name_first=session['name_first'],
             kana_last=session['kana_last'],
@@ -106,18 +114,20 @@ def show(key=None):
         )
 
 
-# show.tplからリンク
-@route('/mail')
-@route('/mail/<key>')
-def mail(key=None):
-    # 不正なアクセスじゃないかをチェック
+# confirm.tplからリンク
+@route('/send')
+@route('/send/<key>')
+def send(key=None):
+    # 不正なアクセスでないかチェック
     session = request.environ.get('beaker.session')
     if not key:
         return template('error', error_statement=valid.state('access'))
     if not key == session.id:
         return template('error', error_statement=valid.state('lost_key'))
 
-    # セッションIDを更新
+    # 以下12行コメントアウト
+    '''
+    # セッションIDを更新して保存
     tmp = {}
     for key in session:
         tmp[key] = session[key]
@@ -127,6 +137,7 @@ def mail(key=None):
         session[key] = tmp[key]
 
     session.save()
+    '''
 
     # ユーザ宛に確認用メールを送信
     host = 'mail.club.kyutech.ac.jp'
@@ -135,16 +146,17 @@ def mail(key=None):
     subject = 'Account Request validation'
     for_user = message.write_first(session)
     msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
-    message.send_msg(from_addr, to_addr, msg, host, 25)
+#    message.send_msg(from_addr, to_addr, msg, host, 25)
     print(for_user)
-    return template('mail')
+
+    return template('send')
 
 
 # 確認用メールからリンク
 @route('/ask')
 @route('/ask/<key>')
 def ask(key=None):
-    # 不正なアクセスじゃないかをチェック
+    # 不正なアクセスでないかチェック
     session = request.environ.get('beaker.session')
     if not key:
         return template('error', error_statement=valid.state('access'))
@@ -154,16 +166,17 @@ def ask(key=None):
     # 承認待ちリストに突っ込む
     database.insert(session)
 
-    # ユーザ宛に申請完了メールを送信
+    # 運用部宛に申請依頼メールを送信
     host = 'mail.club.kyutech.ac.jp'
     from_addr = 'kelt@club.kyutech.ac.jp'
     to_addr = 'lan2014@club.kyutech.ac.jp'
     subject = 'Account Request Succeeded'
-    for_user = message.write_second(session)
-    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
-    message.send_msg(from_addr, to_addr, msg, host, 25)
-    print(for_user)
+    for_admin = message.write_third(session)
+    msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_admin)
+#    message.send_msg(from_addr, to_addr, msg, host, 25)
+    print(for_admin)
 
+    # セッションを削除
     session.delete()
 
     return template('ask')

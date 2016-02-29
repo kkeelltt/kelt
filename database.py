@@ -18,13 +18,12 @@ def create():
 
 
 def insert(session):
-
     conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
     sql = 'INSERT INTO waiting VALUES(?, ?, ?, ?, ?, ?, ?)'
-    c.execute(sql,
-        (session['name_last'],
+    c.execute(sql, (
+        session['name_last'],
          session['name_first'],
          session['kana_last'],
          session['kana_first'],
@@ -38,12 +37,21 @@ def insert(session):
     conn.close()
 
 
-#def select():
+def select(username):
+    conn = sqlite3.connect('sample.db')
+    c = conn.cursor()
 
+    sql = 'SELECT club_account from waiting WHERE club_account=?'
+    c.execute(sql, (username,))
+    result = c.fetchone()
+
+    conn.commit()
+    conn.close()
+
+    return result
 
 
 #def update():
-
 
 
 #def delete():

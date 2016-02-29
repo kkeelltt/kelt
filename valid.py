@@ -3,9 +3,12 @@
 
 
 import re
+import shlex
+import subprocess
+import database
 
 
-def isempty(post):
+def blank(post):
     for key in post:
         if not post[key]:
             return True
@@ -13,35 +16,45 @@ def isempty(post):
     return False
 
 
-def isid(student_id):
+def student_id(student_id):
     return re.match('\A[0-9]{8}\Z', student_id)
 
 
-def isisc(isc_account):
+def isc(isc_account):
     return re.match('\A[a-z][0-9]{6}[a-z]\Z', isc_account)
 
 
-def isusername(username):
+def username(username):
     return re.match('\A[a-z][a-z0-9]{2,7}\Z', username)
 
 
-def isduplicate(username):
-    return False
+def duplicate(username):
+    cmd1 = 'ldapsearch uid={0}'.format(username)
+    cmd2 = 'grep numEntries'
+
+    p1 = subprocess.Popen(shlex.split(cmd1), stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(shlex.split(cmd2),
+                            stdin=p1.stdout, stdout=subprocess.PIPE)
+    p1.stdout.close()
+
+    if p2.communicate()[0]:
+        return True
+    else:
+        return False
 
 
-def iswaiting(username):
-    return False
+def waiting(username):
+    if database.select(username):
+        return True
+    else:
+        return False
 
 
-def ispassword(password):
+def password(password):
     return (
         re.match('\A[!-~]{16,}\Z', password) or
         re.match('\A(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9])[!-~]{8,}\Z', password)
     )
-
-
-def isequal(password, reenter):
-    return password == reenter
 
 
 def state(error_code):
