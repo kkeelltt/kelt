@@ -61,8 +61,8 @@ def confirm(key=None):
     if not valid.username(post['club_account']):
         error.append(valid.state('username'))
 
-#    if valid.duplicate(post['club_account']):
-#        error.append(valid.state('duplicate'))
+    #if valid.duplicate(post['club_account']):
+    #error.append(valid.state('duplicate'))
 
     if  valid.waiting(post['club_account']):
         error.append(valid.state('waiting'))
@@ -146,7 +146,7 @@ def send(key=None):
     subject = 'Account Request validation'
     for_user = message.write_first(session)
     msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
-#    message.send_msg(from_addr, to_addr, msg, host, 25)
+    #message.send_msg(from_addr, to_addr, msg, host, 25)
     print(for_user)
 
     return template('send')
@@ -173,7 +173,7 @@ def ask(key=None):
     subject = 'Account Request Succeeded'
     for_admin = message.write_third(session)
     msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_admin)
-#    message.send_msg(from_addr, to_addr, msg, host, 25)
+    #message.send_msg(from_addr, to_addr, msg, host, 25)
     print(for_admin)
 
     # セッションを削除

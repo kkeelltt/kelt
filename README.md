@@ -1,12 +1,17 @@
-# entry tools
+# 各種申請自動化ツール
 
+***
 
-## siyou tu-ru
+### 使用したツール
 * bottle
 * beaker
 * pytz
 
-## fairu kousei
+`# pip install bottle beaker pytz`
+
+***
+
+### ファイル構成
 * .  
     * entry.py  
     * approve.py  
