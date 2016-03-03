@@ -14,15 +14,6 @@
 ├── database.py
 ├── entry.py
 ├── message.py
-├── __pycache__
-│   ├── database.cpython-35.pyc
-│   ├── message.cpython-35.pyc
-│   └── valid.cpython-35.pyc
-├── README.md
-├── sample.db
-├── session
-│   ├── container_file
-│   └── container_file_lock
 ├── valid.py
 └── views
     ├── ask.tpl
