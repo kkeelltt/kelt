@@ -1,7 +1,9 @@
 #!/user/bin/python
 # -*- coding: utf-8 -*-
 
+from base64 import b64encode
 from datetime import datetime
+from hashlib import sha1
 from socket import gethostbyaddr
 
 from beaker.middleware import SessionMiddleware
@@ -83,7 +85,9 @@ def confirm(key=None):
         # ない: セッションに保存
         for key in data:
             if key == 'password':
-                session[key] = data[key] + '[shadow]'
+                h = sha1()
+                h.update(data[key].encode())
+                session[key] = '{SHA}' + b64encode(h.digest()).decode()
             else:
                 session[key] = data[key]
 
@@ -100,8 +104,7 @@ def confirm(key=None):
 
         # 申請内容の確認画面を表示
         return bottle.template(
-            'confirm',
-            key=session.id,
+            'confirm', key=session.id,
             name_last=session['name_last'],
             name_first=session['name_first'],
             kana_last=session['kana_last'],
@@ -124,20 +127,6 @@ def send(key=None):
         return bottle.template('error', error_list=valid.state('no_key'))
     if not key == session.id:
         return bottle.template('error', error_list=valid.state('lost_key'))
-
-    # 以下12行コメントアウト
-    """
-    # セッションIDを更新して保存
-    tmp = {}
-    for key in session:
-        tmp[key] = session[key]
-
-    session.invalidate()
-    for key in tmp:
-        session[key] = tmp[key]
-
-    session.save()
-    """
 
     # ユーザ宛に確認用メールを送信
     host = 'mail.club.kyutech.ac.jp'
