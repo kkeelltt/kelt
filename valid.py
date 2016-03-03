@@ -8,24 +8,24 @@ import subprocess
 import database
 
 
-def blank(post):
-    for key in post:
-        if not post[key]:
+def blank(data):
+    for key in data:
+        if not data[key]:
             return True
 
     return False
 
 
 def student_id(student_id):
-    return re.match('\A[0-9]{8}\Z', student_id)
+    return re.match('^[0-9]{8}$', student_id)
 
 
 def isc(isc_account):
-    return re.match('\A[a-z][0-9]{6}[a-z]\Z', isc_account)
+    return re.match('^[a-z][0-9]{6}[a-z]$', isc_account)
 
 
 def username(username):
-    return re.match('\A[a-z][a-z0-9]{2,7}\Z', username)
+    return re.match('^[a-z][a-z0-9]{2,7}$', username)
 
 
 def duplicate(username):
@@ -51,11 +51,10 @@ def waiting(username):
 
 
 def password(password):
-    return (
-        re.match('\A[!-~]{16,}\Z', password) or
-        re.match("""\A(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])
-                    (?=.*[^a-zA-Z0-9])[!-~]{8,}\Z""", password)
-        )
+    ptn1 = '^[!-~]{16,}$'
+    ptn2 = '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9])[!-~]{8,}$'
+    return (re.match(ptn1, password) or
+            re.match(ptn2, password))
 
 
 def state(error_code):

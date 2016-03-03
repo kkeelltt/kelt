@@ -1,19 +1,19 @@
 #!/user/bin/python
 # -*- coding: utf-8 -*-
 
-import bottle as btl
+import bottle
 
 
-@btl.route('/request')
+@bottle.route('/request')
 def request():
     # login
 
     # sql select
 
-    return btl.template('request')
+    return bottle.template('request')
 
 
-@btl.route('/finish')
+@bottle.route('/finish')
 def finish():
     # sql delete
 
@@ -23,4 +23,4 @@ def finish():
 
     # send mail to admin
 
-    return btl.template('finish')
+    return bottle.template('finish')

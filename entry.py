@@ -5,7 +5,7 @@ from datetime import datetime
 from socket import gethostbyaddr
 
 from beaker.middleware import SessionMiddleware
-import bottle as btl
+import bottle
 import pytz
 
 import database
@@ -21,29 +21,29 @@ session_opts = {
 }
 
 
-@btl.route('/')
+@bottle.route('/')
 def index():
     # セッションIDを保存
-    session = btl.request.environ.get('beaker.session')
+    session = bottle.request.environ.get('beaker.session')
     session.save()
-    return btl.template('index', key=session.id)
+    return bottle.template('index', key=session.id)
 
 
-@btl.route('/confirm')
-@btl.route('/confirm/<key>')
-@btl.route('/confirm', method='POST')
-@btl.route('/confirm/<key>', method='POST')
+@bottle.route('/confirm')
+@bottle.route('/confirm/<key>')
+@bottle.route('/confirm', method='POST')
+@bottle.route('/confirm/<key>', method='POST')
 def confirm(key=None):
     # 不正なアクセスでないかチェック
-    session = btl.request.environ.get('beaker.session')
+    session = bottle.request.environ.get('beaker.session')
     if not key:
-        return btl.template('error', error_statement=valid.state('no_key'))
+        return bottle.template('error', error_list=valid.state('no_key'))
     if not key == session.id:
-        return btl.template('error', error_statement=valid.state('lost_key'))
+        return bottle.template('error', error_list=valid.state('lost_key'))
 
     # フォームの内容をすべて取得
     data = {}
-    for key, value in btl.request.forms.decode().allitems():
+    for key, value in bottle.request.forms.decode().allitems():
         data[key] = value
 
     # 入力内容の整合性チェック
@@ -72,13 +72,13 @@ def confirm(key=None):
     if not data['password'] == data['reenter']:
         error_list.append(valid.state('mismatch'))
 
-    if not btl.request.forms.agree == 'agree':
+    if not bottle.request.forms.agree == 'agree':
         error_list.append(valid.state('disagree'))
 
     # 入力内容に誤りが
     if error_list:
         # ある: エラーの一覧を表示
-        return btl.template('error', error_list='<br>'.join(error_list))
+        return bottle.template('error', error_list='<br>'.join(error_list))
     else:
         # ない: セッションに保存
         for key in data:
@@ -90,16 +90,16 @@ def confirm(key=None):
         # 申請日時・ホスト名・IPアドレスを取得
         date = datetime.now(pytz.timezone('Asia/Tokyo'))
         session['format_date'] = date.strftime('%Y-%m-%d %H:%M:%S %Z%z')
-        session['remote_addr'] = btl.request.remote_addr
+        session['remote_addr'] = bottle.request.remote_addr
         try:
-            session['remote_host'] = gethostbyaddr(btl.request.remote_addr)[0]
+            session['remote_host'] = gethostbyaddr(session['remote_addr'])[0]
         except OSError:
             session['remote_host'] = '-----'
 
         session.save()
 
         # 申請内容の確認画面を表示
-        return btl.template(
+        return bottle.template(
             'confirm',
             key=session.id,
             name_last=session['name_last'],
@@ -115,15 +115,15 @@ def confirm(key=None):
         )
 
 
-@btl.route('/send')
-@btl.route('/send/<key>')
+@bottle.route('/send')
+@bottle.route('/send/<key>')
 def send(key=None):
     # 不正なアクセスでないかチェック
-    session = btl.request.environ.get('beaker.session')
+    session = bottle.request.environ.get('beaker.session')
     if not key:
-        return btl.template('error', error_statement=valid.state('no_key'))
+        return bottle.template('error', error_list=valid.state('no_key'))
     if not key == session.id:
-        return btl.template('error', error_statement=valid.state('lost_key'))
+        return bottle.template('error', error_list=valid.state('lost_key'))
 
     # 以下12行コメントアウト
     """
@@ -143,23 +143,23 @@ def send(key=None):
     host = 'mail.club.kyutech.ac.jp'
     from_addr = 'kelt@club.kyutech.ac.jp'
     to_addr = 'lan2014@club.kyutech.ac.jp'
-    subject = 'Account btl.request validation'
+    subject = 'Account bottle.request validation'
     for_user = message.write_first(session)
     msg = message.create_msg(from_addr, to_addr, 'utf-8', subject, for_user)
     message.send_msg(from_addr, to_addr, msg, host, 25)
 
-    return btl.template('send')
+    return bottle.template('send')
 
 
-@btl.route('/ask')
-@btl.route('/ask/<key>')
+@bottle.route('/ask')
+@bottle.route('/ask/<key>')
 def ask(key=None):
     # 不正なアクセスでないかチェック
-    session = btl.request.environ.get('beaker.session')
+    session = bottle.request.environ.get('beaker.session')
     if not key:
-        return btl.template('error', error_statement=valid.state('no_key'))
+        return bottle.template('error', error_list=valid.state('no_key'))
     if not key == session.id:
-        return btl.template('error', error_statement=valid.state('lost_key'))
+        return bottle.template('error', error_list=valid.state('lost_key'))
 
     # 承認待ちリストに突っ込む
     database.insert(session)
@@ -176,9 +176,9 @@ def ask(key=None):
     # セッションを削除
     session.delete()
 
-    return btl.template('ask')
+    return bottle.template('ask')
 
 
 if __name__ == '__main__':
-    btl.app = SessionMiddleware(btl.app(), session_opts)
-    btl.run(app=btl.app, host='', port=8080, debug=True, reloader=True)
+    app = SessionMiddleware(bottle.app(), session_opts)
+    bottle.run(app=app, host='', port=8080, debug=True, reloader=True)

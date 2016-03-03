@@ -8,8 +8,8 @@ def create():
     conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
-    sql = """CREATE TABLE waiting(name_last, name_first, kana_last, kana_first,
-                                  club_account, isc_account, password)"""
+    sql = 'CREATE TABLE waiting(name_last, name_first, kana_last, kana_first, \
+                                club_account, isc_account, password)'
     c.execute(sql)
 
     conn.commit()
