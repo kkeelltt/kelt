@@ -1,7 +1,6 @@
 #!/user/bin/python
 # -*- coding: utf-8 -*-
 
-
 import sqlite3
 
 
@@ -9,8 +8,8 @@ def create():
     conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
-    sql = '''CREATE TABLE waiting(name_last, name_first, kana_last, kana_first,
-                                  club_account, isc_account, password)'''
+    sql = """CREATE TABLE waiting(name_last, name_first, kana_last, kana_first,
+                                  club_account, isc_account, password)"""
     c.execute(sql)
 
     conn.commit()
@@ -29,15 +28,14 @@ def insert(session):
         session['kana_first'],
         session['club_account'],
         session['isc_account'],
-        session['password']
-        )
+        session['password'])
     )
 
     conn.commit()
     conn.close()
 
 
-def select(username):
+def search(username):
     conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 

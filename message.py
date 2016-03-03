@@ -1,16 +1,15 @@
 #!/user/bin/python
 # -*- coding: utf-8 -*-
 
-
-import smtplib
-from email.mime.text import MIMEText
 from email.header import Header
+from email.mime.text import MIMEText
 from email.utils import formatdate
+import smtplib
 
 
 def create_msg(from_addr, to_addr, charset, subject, body):
     msg = MIMEText(body, 'plain', charset)
-    msg['Subject'] = Header(subject,charset)
+    msg['Subject'] = Header(subject, charset)
     msg['From'] = from_addr
     msg['To'] = to_addr
     msg['Date'] = formatdate(localtime=True)
@@ -25,7 +24,7 @@ def send_msg(from_addr, to_addr, msg, host, port):
 
 
 def write_first(session):
-    body  = '=================================================================\n'
+    body = '=================================================================\n'
     body += '　共用計算機アカウント申請手続きのご案内\n'
     body += '=================================================================\n'
     body += '\n'
@@ -62,7 +61,7 @@ def write_first(session):
 
 
 def write_second(session):
-    body  = '=================================================================\n'
+    body = '=================================================================\n'
     body += '　共用計算機アカウント申請手続きのご案内\n'
     body += '=================================================================\n'
     body += '\n'
@@ -95,7 +94,7 @@ def write_second(session):
 
 
 def write_third(session):
-    body  = '=================================================================\n'
+    body = '=================================================================\n'
     body += '　共用計算機アカウント申請依頼\n'
     body += '=================================================================\n'
     body += '\n'

@@ -1,27 +1,19 @@
 #!/user/bin/python
 # -*- coding: utf-8 -*-
 
-
-from socket import gethostbyaddr, herror
-from datetime import datetime
-from bottle import route, post, run, template, request, app
-from beaker.middleware import SessionMiddleware
-import pytz
-import message
-import valid
-import database
+import bottle as btl
 
 
-@route('/request')
+@btl.route('/request')
 def request():
     # login
 
     # sql select
 
-    return template('request')
+    return btl.template('request')
 
 
-@route('/finish')
+@btl.route('/finish')
 def finish():
     # sql delete
 
@@ -31,4 +23,4 @@ def finish():
 
     # send mail to admin
 
-    return template('finish')
+    return btl.template('finish')
