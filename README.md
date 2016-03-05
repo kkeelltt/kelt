@@ -16,9 +16,9 @@
 ├── message.py
 ├── valid.py
 └── views
-    ├── ask.tpl
     ├── confirm.tpl
     ├── error.tpl
+    ├── finish.tpl
     ├── index.tpl
     └── send.tpl
 ```
