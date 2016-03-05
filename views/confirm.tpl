@@ -17,11 +17,11 @@
 <p>  -------------------------------------------------------------</p>
 <p>  Account : {{club_account}}</p>
 <p>  -------------------------------------------------------------</p>
-<p>  Date    : {{format_date}}</p>
+<p>  Date    : {{format_time}}</p>
 <p>  From    : {{remote_host}} ({{remote_addr}})</p>
 <p>=================================================================</p>
 <form action="/send/{{key}}" method="GET">
-  <input type="submit" value="送信">
+    <input type="submit" value="送信">
 </form>
 </body>
 

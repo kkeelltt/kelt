@@ -4,17 +4,8 @@
 import bottle
 
 
-@bottle.route('/request')
-def request():
-    # login
-
-    # sql select
-
-    return bottle.template('request')
-
-
-@bottle.route('/finish')
-def finish():
+@bottle.route('/approve')
+def approve():
     # sql delete
 
     # ldap insert
@@ -23,4 +14,4 @@ def finish():
 
     # send mail to admin
 
-    return bottle.template('finish')
+    return bottle.template('approve')

@@ -8,8 +8,9 @@ def create():
     conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
-    sql = 'CREATE TABLE waiting(name_last, name_first, kana_last, kana_first, \
-                                club_account, isc_account, password)'
+    sql = """CREATE TABLE waiting(name_last, name_first,
+                                  kana_last, kana_first,
+                                  club_account, isc_account, password)"""
     c.execute(sql)
 
     conn.commit()
@@ -35,12 +36,12 @@ def insert(session):
     conn.close()
 
 
-def search(username):
+def search(club_account):
     conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
     sql = 'SELECT club_account FROM waiting WHERE club_account=?'
-    c.execute(sql, (username,))
+    c.execute(sql, (club_account,))
     result = c.fetchone()
 
     conn.commit()

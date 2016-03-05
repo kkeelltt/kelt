@@ -20,16 +20,16 @@ def student_id(student_id):
     return re.match('^[0-9]{8}$', student_id)
 
 
-def isc(isc_account):
+def isc_account(isc_account):
     return re.match('^[a-z][0-9]{6}[a-z]$', isc_account)
 
 
-def username(username):
-    return re.match('^[a-z][a-z0-9]{2,7}$', username)
+def club_account(club_account):
+    return re.match('^[a-z][a-z0-9]{2,7}$', club_account)
 
 
-def duplicate(username):
-    cmd1 = 'ldapsearch uid={0}'.format(username)
+def duplicate(club_account):
+    cmd1 = 'ldapsearch uid={0}'.format(club_account)
     cmd2 = 'grep numEntries'
 
     p1 = subprocess.Popen(shlex.split(cmd1), stdout=subprocess.PIPE)
@@ -43,8 +43,8 @@ def duplicate(username):
         return False
 
 
-def waiting(username):
-    if database.search(username):
+def waiting(club_account):
+    if database.search(club_account):
         return True
     else:
         return False
@@ -65,12 +65,11 @@ error_cases = {
     'blank': 'フォームに空欄があります。',
     'student_id': '学生番号が不正です。',
     'isc_account': '情報科学センターアカウントが不正です。',
-    'username': '共用計算機アカウントが不正です。',
+    'club_account': '共用計算機アカウントが不正です。',
     'duplicate': 'ご希望のアカウント名は既に使用されています。',
     'waiting': 'ご希望のアカウントでの申請はすでに受け付けられています。',
     'password': 'パスワードが不正です。',
     'mismatch': 'パスワードが一致しません。',
     'disagree': '規約に同意しないとアカウントは申請できません。',
-    'no_key': '不正なアクセスを検出しました。',
-    'lost_key': 'セッション情報がありません。'
+    'lost_key': '不正なアクセスを検出しました。',
 }

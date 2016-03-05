@@ -7,7 +7,7 @@
 
 <body>
 <h1>ERROR!!</h1>
-<p><strong>{{!error_list}}</strong></p>
+<p><strong>{{!error}}</strong></p>
 </body>
 
 </html>
