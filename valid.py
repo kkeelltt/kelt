@@ -2,18 +2,64 @@
 # -*- coding: utf-8 -*-
 
 import re
-import shlex
-import subprocess
+
+import bottle
 
 import database
+import ldap
+
+error_cases = {
+    'blank': 'フォームに空欄があります。',
+    'student_id': '学生番号が不正です。',
+    'isc_account': '情報科学センターアカウントが不正です。',
+    'club_account': '共用計算機アカウントが不正です。',
+    'duplicate': 'ご希望のアカウント名は既に使用されています。',
+    'waiting': 'ご希望のアカウントでの申請はすでに受け付けられています。',
+    'password': 'パスワードが不正です。',
+    'mismatch': 'パスワードが一致しません。',
+    'disagree': '規約に同意しないとアカウントは申請できません。',
+    'lost_key': '不正なアクセスを検出しました。',
+}
+
+
+def validation(data):
+    error_list = list()
+    if blank(data):
+        error_list.append(state('blank'))
+
+    if not student_id(data['student_id']):
+        error_list.append(state('student_id'))
+
+    if not isc_account(data['isc_account']):
+        error_list.append(state('isc_account'))
+
+    if not club_account(data['club_account']):
+        error_list.append(state('club_account'))
+
+    # if duplicate(data['club_account']):
+    #    error_list.append(state('duplicate'))
+
+    if waiting(data['club_account']):
+        error_list.append(state('waiting'))
+
+    if not password(data['password']):
+        error_list.append(state('password'))
+    else:
+        if not data['password'] == data['password_retype']:
+            error_list.append(state('mismatch'))
+
+    if not bottle.request.forms.get('agree') == 'agree':
+        error_list.append(state('disagree'))
+
+    return error_list
 
 
 def blank(data):
     for key in data:
         if not data[key]:
             return True
-
-    return False
+    else:
+        return False
 
 
 def student_id(student_id):
@@ -29,22 +75,14 @@ def club_account(club_account):
 
 
 def duplicate(club_account):
-    cmd1 = 'ldapsearch uid={0}'.format(club_account)
-    cmd2 = 'grep numEntries'
-
-    p1 = subprocess.Popen(shlex.split(cmd1), stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(shlex.split(cmd2),
-                          stdin=p1.stdout, stdout=subprocess.PIPE)
-    p1.stdout.close()
-
-    if p2.communicate()[0]:
+    if ldap.ldapsearch(club_account):
         return True
     else:
         return False
 
 
 def waiting(club_account):
-    if database.search(club_account):
+    if database.select(club_account):
         return True
     else:
         return False
@@ -59,17 +97,3 @@ def password(password):
 
 def state(error_code):
     return error_cases[error_code]
-
-
-error_cases = {
-    'blank': 'フォームに空欄があります。',
-    'student_id': '学生番号が不正です。',
-    'isc_account': '情報科学センターアカウントが不正です。',
-    'club_account': '共用計算機アカウントが不正です。',
-    'duplicate': 'ご希望のアカウント名は既に使用されています。',
-    'waiting': 'ご希望のアカウントでの申請はすでに受け付けられています。',
-    'password': 'パスワードが不正です。',
-    'mismatch': 'パスワードが一致しません。',
-    'disagree': '規約に同意しないとアカウントは申請できません。',
-    'lost_key': '不正なアクセスを検出しました。',
-}

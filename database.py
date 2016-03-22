@@ -10,41 +10,57 @@ def create():
 
     sql = """CREATE TABLE waiting(name_last, name_first,
                                   kana_last, kana_first,
-                                  club_account, isc_account, password)"""
+                                  student_id, isc_account,
+                                  club_account, password
+                                  )"""
     c.execute(sql)
 
     conn.commit()
     conn.close()
 
 
-def insert(session):
+def insert(data):
     conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
-    sql = 'INSERT INTO waiting VALUES(?, ?, ?, ?, ?, ?, ?)'
+    sql = 'INSERT INTO waiting VALUES(?, ?, ?, ?, ?, ?, ?, ?)'
     c.execute(sql, (
-        session['name_last'],
-        session['name_first'],
-        session['kana_last'],
-        session['kana_first'],
-        session['club_account'],
-        session['isc_account'],
-        session['password'])
+        data['name_last'],
+        data['name_first'],
+        data['kana_last'],
+        data['kana_first'],
+        data['student_id'],
+        data['isc_account'],
+        data['club_account'],
+        data['password'])
     )
 
     conn.commit()
     conn.close()
 
 
-def search(club_account):
+def select(club_account):
     conn = sqlite3.connect('sample.db')
     c = conn.cursor()
 
-    sql = 'SELECT club_account FROM waiting WHERE club_account=?'
+    sql = 'SELECT * FROM waiting WHERE club_account=?'
     c.execute(sql, (club_account,))
-    result = c.fetchone()
+    tmp = c.fetchall()
 
     conn.commit()
     conn.close()
 
-    return result
+    if tmp:
+        data = dict()
+        data['name_last'] = tmp[0][0]
+        data['name_first'] = tmp[0][1]
+        data['kana_last'] = tmp[0][2]
+        data['kana_first'] = tmp[0][3]
+        data['student_id'] = tmp[0][4]
+        data['isc_account'] = tmp[0][5]
+        data['club_account'] = tmp[0][6]
+        data['password'] = tmp[0][7]
+
+        return data
+    else:
+        return None

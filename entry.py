@@ -14,7 +14,7 @@ import database
 import message
 import valid
 
-__version__ = 'Rev.2016030'
+__version__ = 'Rev.20160321'
 SMTP_SVR = 'mail.club.kyutech.ac.jp'
 FROM_ADDR = 'kelt@club.kyutech.ac.jp'  # entry@club.kyutech.ac.jp
 ADMIN_ADDR = 'lan2014@club.kyutech.ac.jp'  # admin-sys@club.kyutech.ac.jp
@@ -52,37 +52,11 @@ def confirm(key=None):
         data[key] = value
 
     # 入力内容に誤りがないかどうかチェック
-    error = list()
-    if valid.blank(data):
-        error.append(valid.state('blank'))
-
-    if not valid.student_id(data['student_id']):
-        error.append(valid.state('student_id'))
-
-    if not valid.isc_account(data['isc_account']):
-        error.append(valid.state('isc_account'))
-
-    if not valid.club_account(data['club_account']):
-        error.append(valid.state('club_account'))
-
-    # if valid.duplicate(data['club_account']):
-    #    error.append(valid.state('duplicate'))
-
-    if valid.waiting(data['club_account']):
-        error.append(valid.state('waiting'))
-
-    if not valid.password(data['password']):
-        error.append(valid.state('password'))
-    else:
-        if not data['password'] == data['password_retype']:
-            error.append(valid.state('mismatch'))
-
-    if not bottle.request.forms.agree == 'agree':
-        error.append(valid.state('disagree'))
+    error_list = valid.validation(data)
 
     # 入力内容に誤りがあった場合、誤り内容の一覧を表示
-    if error:
-        return bottle.template('error', error='<br>'.join(error))
+    if error_list:
+        return bottle.template('error', error='<br>'.join(error_list))
 
     # パスワードの暗号化
     h = hashlib.sha1()
@@ -91,7 +65,7 @@ def confirm(key=None):
 
     # 申請日時・ホスト名・IPアドレスを取得
     date = datetime.now(pytz.timezone('Asia/Tokyo'))
-    data['format_time'] = date.strftime('%Y-%m-%d %H:%M:%S %Z%z')
+    data['format_time'] = date.strftime('%Y-%m-%d %H:%M:%S %z')
     data['remote_addr'] = bottle.request.remote_addr
     try:
         data['remote_host'] = gethostbyaddr(data['remote_addr'])[0]
@@ -101,8 +75,8 @@ def confirm(key=None):
     # セッションに保存
     for key in data:
         session[key] = data[key]
-
-    session.save()
+    else:
+        session.save()
 
     # 申請内容の確認画面を表示
     return bottle.template(

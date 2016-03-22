@@ -3,7 +3,7 @@
 
 # import base64
 from email.mime.text import MIMEText
-# from email.utils import formatdate
+from email.utils import formatdate
 import smtplib
 # import subprocess
 
@@ -13,7 +13,8 @@ def create_msg(from_addr, to_addr, subject, body_text):
     msg['Subject'] = subject
     msg['From'] = from_addr
     msg['To'] = to_addr
-    # msg['Date'] = formatdate(localtime=True)
+    msg['Date'] = formatdate(localtime=True)
+
     return msg
 
 
@@ -62,19 +63,11 @@ def write_first(session):
     return body
 
 
+"""
 def write_second(session):
     isc_ldap = dict(displayName='', gecos='', employeeNumber='', mail='')
     club_ldap = dict(displayName='', employeeNumber='')
-    """
-    for key in isc_ldap:
-        cmd = '/home/staff/CIA/admin-sys/isc-ldap/ldifsearch'
-        isc_ldap[key] = subprocess.Popen(
-            [cmd, session['club_account'], key],
-            stdout=subprocess.PIPE
-        ).communicate()[0].decode()
 
-    isc_ldap['displayName'] = base64.b64decode(isc_ldap['displayName'])
-    """
     body = str()
     body += '===============================================================\n'
     body += '　共用計算機アカウント申請依頼\n'
@@ -120,3 +113,4 @@ def write_second(session):
     body += '                 Copyright (C) 2016 Kentaro OISHI / K.I.T. SANC\n'
 
     return body
+"""
